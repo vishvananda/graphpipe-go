@@ -8,7 +8,7 @@ package graphpipe
 import (
 	"fmt"
 
-	graphpipefb "github.com/oracle/graphpipe-go/graphpipefb"
+	graphpipefb "github.com/vishvananda/graphpipe-go/graphpipefb"
 )
 
 func getOutputNames(c *appContext, req *graphpipefb.InferRequest) ([]string, error) {

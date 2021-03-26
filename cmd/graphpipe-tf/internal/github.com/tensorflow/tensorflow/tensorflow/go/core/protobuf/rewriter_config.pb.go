@@ -6,7 +6,7 @@ package protobuf
 import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import tensorflow5 "github.com/oracle/graphpipe-go/cmd/graphpipe-tf/internal/github.com/tensorflow/tensorflow/tensorflow/go/core/framework"
+import tensorflow5 "github.com/vishvananda/graphpipe-go/cmd/graphpipe-tf/internal/github.com/tensorflow/tensorflow/tensorflow/go/core/framework"
 
 import sortkeys "github.com/gogo/protobuf/sortkeys"
 

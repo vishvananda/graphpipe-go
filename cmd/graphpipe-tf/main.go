@@ -22,10 +22,10 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	graphpipe "github.com/oracle/graphpipe-go"
-	tfproto "github.com/oracle/graphpipe-go/cmd/graphpipe-tf/internal/github.com/tensorflow/tensorflow/tensorflow/go/core/framework"
-	cproto "github.com/oracle/graphpipe-go/cmd/graphpipe-tf/internal/github.com/tensorflow/tensorflow/tensorflow/go/core/protobuf"
-	graphpipefb "github.com/oracle/graphpipe-go/graphpipefb"
+	graphpipe "github.com/vishvananda/graphpipe-go"
+	tfproto "github.com/vishvananda/graphpipe-go/cmd/graphpipe-tf/internal/github.com/tensorflow/tensorflow/tensorflow/go/core/framework"
+	cproto "github.com/vishvananda/graphpipe-go/cmd/graphpipe-tf/internal/github.com/tensorflow/tensorflow/tensorflow/go/core/protobuf"
+	graphpipefb "github.com/vishvananda/graphpipe-go/graphpipefb"
 	tf "github.com/tensorflow/tensorflow/tensorflow/go"
 )
 

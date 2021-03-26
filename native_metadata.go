@@ -7,7 +7,7 @@ package graphpipe
 
 import (
 	fb "github.com/google/flatbuffers/go"
-	graphpipefb "github.com/oracle/graphpipe-go/graphpipefb"
+	graphpipefb "github.com/vishvananda/graphpipe-go/graphpipefb"
 )
 
 // NativeIOMetadata holds information describing the format of

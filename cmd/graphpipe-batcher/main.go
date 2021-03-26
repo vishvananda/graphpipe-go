@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 
-	graphpipe "github.com/oracle/graphpipe-go"
+	graphpipe "github.com/vishvananda/graphpipe-go"
 )
 
 var (

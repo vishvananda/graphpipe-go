@@ -16,7 +16,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	bolt "github.com/coreos/bbolt"
-	graphpipefb "github.com/oracle/graphpipe-go/graphpipefb"
+	graphpipefb "github.com/vishvananda/graphpipe-go/graphpipefb"
 )
 
 const (

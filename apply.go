@@ -16,7 +16,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 
-	graphpipefb "github.com/oracle/graphpipe-go/graphpipefb"
+	graphpipefb "github.com/vishvananda/graphpipe-go/graphpipefb"
 )
 
 // Applier is the base signature for server actions.

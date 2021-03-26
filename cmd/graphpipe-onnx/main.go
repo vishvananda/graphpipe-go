@@ -23,8 +23,8 @@ import (
 	"unsafe"
 
 	"github.com/Sirupsen/logrus"
-	graphpipe "github.com/oracle/graphpipe-go"
-	graphpipefb "github.com/oracle/graphpipe-go/graphpipefb"
+	graphpipe "github.com/vishvananda/graphpipe-go"
+	graphpipefb "github.com/vishvananda/graphpipe-go/graphpipefb"
 	"github.com/spf13/cobra"
 )
 

@@ -7,7 +7,7 @@ package main
 
 import (
 	"github.com/Sirupsen/logrus"
-	graphpipe "github.com/oracle/graphpipe-go"
+	graphpipe "github.com/vishvananda/graphpipe-go"
 )
 
 func main() {

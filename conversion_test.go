@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	fb "github.com/google/flatbuffers/go"
-	graphpipefb "github.com/oracle/graphpipe-go/graphpipefb"
+	graphpipefb "github.com/vishvananda/graphpipe-go/graphpipefb"
 )
 
 func TestGetMethodTypeShapes(t *testing.T) {
