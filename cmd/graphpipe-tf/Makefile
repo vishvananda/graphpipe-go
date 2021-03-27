@@ -1,6 +1,7 @@
 NAME=graphpipe-tf
 RUN_TYPE?=cpu
 TF_DIR=/usr/local
+TF_VER=2.4.1
 SUDO=sudo
 LIBTF_IMAGE=libtensorflow
 GRAPHPIPE_TF_IMAGE=graphpipe-tf
@@ -35,15 +36,15 @@ endif
 in-docker:
 	docker inspect --type=image $(LIBTF_IMAGE):$(RUN_TYPE)-dev > /dev/null ||  make dev-container
 	docker run -it --rm \
-		-v $(PWD)/../../:/go/src/github.com/oracle/graphpipe-go \
-		-w /go/src/github.com/oracle/graphpipe-go/cmd/graphpipe-tf \
+		-v $(PWD)/../../:/go/src/github.com/vishvananda/graphpipe-go \
+		-w /go/src/github.com/vishvananda/graphpipe-go/cmd/graphpipe-tf \
 		-e http_proxy=$(http_proxy) \
 		-e https_proxy=$(https_proxy) \
 		-e USE_SUDO=0 \
 		-e GOPATH=/go \
 		-e CHOWN=$$(id -u):$$(id -g) \
 		$(LIBTF_IMAGE):$(RUN_TYPE)-dev \
-		/usr/bin/make install-govendor deps $(RUN_TYPE) copy-files-$(RUN_TYPE) graphpipe-tf fix-perms
+		/usr/bin/make $(RUN_TYPE) tf-generate graphpipe-tf
 
 check-go-version:
 	$(eval min_version := go1.8)
@@ -61,31 +62,13 @@ local: $(NAME)
 cpu:
 	# pass
 
-copy-files-cpu:
-	mkdir -p lib
-	cp /root/.cache/bazel/_bazel_root/*/external/mkl_linux/lib/* lib/
-	cp /usr/local/lib/libtensorflow* lib/
-
-oraclelinux-cpu:
-	# pass
-
-copy-files-oraclelinux-cpu:
-	mkdir -p lib
-	cp /root/.cache/bazel/_bazel_root/*/external/mkl_linux/lib/* lib/
-	cp /usr/local/lib/libtensorflow* lib/
-
 gpu:
 	ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/libcuda.so.1
 
-copy-files-gpu:
-	mkdir -p lib
-	cp /root/.cache/bazel/_bazel_root/*/external/mkl_linux/lib/* lib/
-	cp /usr/local/lib/libtensorflow* lib/
-
 devshell:
 	docker run -it --rm \
-		-v $(PWD)/../../:/go/src/github.com/oracle/graphpipe-go \
-        -w /go/src/github.com/oracle/graphpipe-go/cmd/graphpipe-tf \
+		-v $(PWD)/../../:/go/src/github.com/vishvananda/graphpipe-go \
+        -w /go/src/github.com/vishvananda/graphpipe-go/cmd/graphpipe-tf \
         -p 9000:9000 \
         -e http_proxy=$(http_proxy) \
         -e https_proxy=$(https_proxy) \
@@ -103,8 +86,8 @@ dev-container:
 
 devserver:
 	$(DOCKER) run -it --rm \
-        -v $(PWD)/../../:/go/src/github.com/oracle/graphpipe-go \
-        -w /go/src/github.com/oracle/graphpipe-go/cmd/graphpipe-tf \
+        -v $(PWD)/../../:/go/src/github.com/vishvananda/graphpipe-go \
+        -w /go/src/github.com/vishvananda/graphpipe-go/cmd/graphpipe-tf \
         -e http_proxy=$(http_proxy) \
         -e https_proxy=$(https_proxy) \
         -p 9000:9000 \
@@ -130,36 +113,15 @@ runserver:
         --model=$(MODEL_URL) \
 		--listen=0.0.0.0:9000
 
-install-govendor:
-	@if [ ! -e $(GOPATH)/bin/govendor ]; then \
-		go get -u github.com/kardianos/govendor; \
-	fi
-
-govendor:
-	@if [ ! -e $(GOPATH)/bin/govendor ]; then \
-		echo "You need govendor: go get -u github.com/kardianos/govendor" && exit 1; \
-	fi
-
-graphpipe-go-deps:
-	cd ../../ && make deps
-
-go-deps: govendor
-	$(GOPATH)/bin/govendor sync -v
-
 install-tensorflow:
 	@if [ ! -e /usr/local/include/tensorflow/c/c_api.h ]; then \
-		curl -L "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-$(RUN_TYPE)-linux-x86_64-1.8.0.tar.gz" | \
+		curl -L "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-$(RUN_TYPE)-linux-x86_64-$(TF_VER).tar.gz" | \
 			$(SUDO) tar -C $(TF_DIR) -xz; \
 	fi
 
 tensorflow:
 	@if [ ! -e /usr/local/include/tensorflow/c/c_api.h ]; then \
 		echo "You need tensorflow installed: https://www.tensorflow.org/install/install_go" && exit 1; \
-	fi
-
-fix-perms:
-	@if [ -n "$${CHOWN}" ]; then \
-		chown -R $${CHOWN} lib vendor $(NAME) ../../vendor; \
 	fi
 
 PROTOC=protoc
@@ -176,8 +138,21 @@ protobuf:
 	cd protoc-gen-gogotf && go install
 	PATH=$(GOPATH)/bin:$(PATH) $(PROTOC) -I$(TF)/ $(TF)/tensorflow/core/framework/*.proto --gogotf_out=internal/
 	PATH=$(GOPATH)/bin:$(PATH) $(PROTOC) -I$(TF)/ $(PROTOS) --gogotf_out=internal/
-	sed -i 's;github.com/tensorflow;github.com/oracle/graphpipe-go/cmd/graphpipe-tf/internal/github.com/tensorflow;g' internal/github.com/tensorflow/tensorflow/tensorflow/go/core/protobuf/*.pb.go
+	sed -i 's;github.com/tensorflow;github.com/vishvananda/graphpipe-go/cmd/graphpipe-tf/internal/github.com/tensorflow;g' internal/github.com/tensorflow/tensorflow/tensorflow/go/core/protobuf/*.pb.go
 
-deps: graphpipe-go-deps go-deps
+VER=tensorflow@v$(TF_VER)+incompatible
+
+tf-generate:
+	go mod download
+	mkdir -p /go/src/github.com/tensorflow
+	ln -s $(GOPATH)/pkg/mod/github.com/tensorflow/$(VER) $(GOPATH)/src/github.com/tensorflow/tensorflow
+	cd $(GOPATH)/pkg/mod/github.com/tensorflow/$(VER); \
+		chmod -R +w .; \
+		ln -s vendor/github.com/tensorflow/tensorflow/tensorflow/go/core tensorflow/go; \
+		ln -s vendor/github.com/tensorflow/tensorflow/tensorflow/go/stream_executor tensorflow/go; \
+		go mod init github.com/tensorflow/tensorflow; \
+		go get google.golang.org/protobuf/runtime/protoimpl@v1.26.0; \
+		go get google.golang.org/protobuf/reflect/protoreflect@v1.26.0; \
+		go generate github.com/tensorflow/tensorflow/tensorflow/go/op
 
 all: dev-container in-docker runtime-container

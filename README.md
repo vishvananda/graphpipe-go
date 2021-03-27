@@ -86,7 +86,7 @@ which can receive a graphpipe network request, and echo it back to the client:
 package main
 
 import (
-    "github.com/Sirupsen/logrus"
+    "github.com/sirupsen/logrus"
     graphpipe "github.com/oracle/graphpipe-go"
 )
 

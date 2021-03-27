@@ -1,34 +1,39 @@
-FROM ubuntu:16.04
+FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TERM=linux
 
 RUN apt-get update && apt install -y software-properties-common
-RUN add-apt-repository ppa:gophers/archive
+RUN add-apt-repository ppa:longsleep/golang-backports
 RUN apt-get update && apt-get install -y \
     linux-libc-dev \
     manpages-dev \
     python-dev \
-    golang-1.10-go \
+    golang-1.16-go \
     git \
     curl \
-    patch
+    patch \
+    make \
+    protobuf-compiler
 
-ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/go-1.10/bin:/go/bin
+
+ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/go-1.16/bin:/go/bin
 
 RUN go get -u github.com/kardianos/govendor
 RUN git clone https://github.com/tensorflow/tensorflow /tensorflow
 WORKDIR /tensorflow
-RUN git pull && git checkout v1.11.0
+RUN git pull && git checkout v2.4.1
 
 RUN echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list
 RUN curl https://bazel.build/bazel-release.pub.gpg |  apt-key add -
-RUN apt-get update &&  apt-get install -y bazel
+RUN apt-get update &&  apt-get install -y bazel-3.1.0
+RUN ln -s /usr/bin/bazel-3.1.0 /usr/bin/bazel
 
 RUN yes "" | ./configure
 
+RUN apt-get install -y python3-distutils python3-numpy
 RUN bazel build --config=mkl --config=monolithic //tensorflow:libtensorflow.so
 RUN cp bazel-bin/tensorflow/libtensorflow.so /usr/local/lib
-RUN cp /root/.cache/bazel/_bazel_root/*/external/mkl_linux/lib/* /usr/local/lib
+RUN cp /root/.cache/bazel/_bazel_root/*/execroot/org_tensorflow/bazel-out/host/bin/external/llvm_openmp/libiomp5.so /usr/local/lib
 RUN ldconfig
 RUN ln -s /tensorflow/tensorflow /usr/local/include/tensorflow

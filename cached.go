@@ -1,7 +1,7 @@
 /*
 ** Copyright © 2018, Oracle and/or its affiliates. All rights reserved.
 ** Licensed under the Universal Permissive License v 1.0 as shown at http://oss.oracle.com/licenses/upl.
-*/
+ */
 
 package graphpipe
 
@@ -14,8 +14,8 @@ import (
 	"sync"
 	"unsafe"
 
-	"github.com/Sirupsen/logrus"
 	bolt "github.com/coreos/bbolt"
+	"github.com/sirupsen/logrus"
 	graphpipefb "github.com/vishvananda/graphpipe-go/graphpipefb"
 )
 

@@ -22,10 +22,10 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 	graphpipe "github.com/vishvananda/graphpipe-go"
 	graphpipefb "github.com/vishvananda/graphpipe-go/graphpipefb"
-	"github.com/spf13/cobra"
 )
 
 // #cgo CXXFLAGS: -DONNX_NAMESPACE=onnx_c2 -D_GNU_SOURCE -D_REENTRANT -D CAFFE2_USE_GFLAGS -D CAFFE2_USE_GOOGLE_GLOG -D NDEBUG -I /usr/local/cuda/include -std=c++11 -O2
