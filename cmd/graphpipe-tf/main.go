@@ -22,11 +22,12 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	graphpipe "github.com/vishvananda/graphpipe-go"
-	tfproto "github.com/vishvananda/graphpipe-go/cmd/graphpipe-tf/internal/github.com/tensorflow/tensorflow/tensorflow/go/core/framework"
-	cproto "github.com/vishvananda/graphpipe-go/cmd/graphpipe-tf/internal/github.com/tensorflow/tensorflow/tensorflow/go/core/protobuf"
-	graphpipefb "github.com/vishvananda/graphpipe-go/graphpipefb"
 	tf "github.com/tensorflow/tensorflow/tensorflow/go"
+	graphpipe "github.com/vishvananda/graphpipe-go"
+	graphproto "github.com/vishvananda/graphpipe-go/cmd/graphpipe-tf/internal/github.com/tensorflow/tensorflow/tensorflow/go/core/framework/graph_go_proto"
+	typesproto "github.com/vishvananda/graphpipe-go/cmd/graphpipe-tf/internal/github.com/tensorflow/tensorflow/tensorflow/go/core/framework/types_go_proto"
+	cproto "github.com/vishvananda/graphpipe-go/cmd/graphpipe-tf/internal/github.com/tensorflow/tensorflow/tensorflow/go/core/protobuf/for_core_protos_go_proto"
+	graphpipefb "github.com/vishvananda/graphpipe-go/graphpipefb"
 )
 
 var (
@@ -127,7 +128,7 @@ func main() {
 
 type tfContext struct {
 	modelHash []byte
-	graphDef  tfproto.GraphDef
+	graphDef  graphproto.GraphDef
 
 	model *tf.SavedModel
 
@@ -278,7 +279,7 @@ func readModel(uri string) ([]byte, error) {
 	return ioutil.ReadFile(uri)
 }
 
-func graphContainsNode(g tfproto.GraphDef, name string) bool {
+func graphContainsNode(g graphproto.GraphDef, name string) bool {
 	name = strings.Split(name, ":")[0]
 	for _, n := range g.Node {
 		if n.Name == name {
@@ -456,19 +457,19 @@ func getOutputRequests(c *tfContext, outputNames []string) ([]tf.Output, error) 
 }
 
 var gptype2tftype = []tf.DataType{
-	tf.DataType(tfproto.DataType_DT_INVALID), // Type_Null = 0,
-	tf.DataType(tfproto.DataType_DT_UINT8),   // Type_Uint8 = 1,
-	tf.DataType(tfproto.DataType_DT_INT8),    // Type_Int8 = 2,
-	tf.DataType(tfproto.DataType_DT_UINT16),  // Type_Uint16 = 3,
-	tf.DataType(tfproto.DataType_DT_INT16),   // Type_Int16 = 4,
-	tf.DataType(tfproto.DataType_DT_UINT32),  // Type_Uint32 = 5,
-	tf.DataType(tfproto.DataType_DT_INT32),   // Type_Int32 = 6,
-	tf.DataType(tfproto.DataType_DT_UINT64),  // Type_Uint64 = 7,
-	tf.DataType(tfproto.DataType_DT_INT64),   // Type_Int64 = 8,
-	tf.DataType(tfproto.DataType_DT_HALF),    // Type_Float16 = 9,
-	tf.DataType(tfproto.DataType_DT_FLOAT),   // Type_Float32 = 10,
-	tf.DataType(tfproto.DataType_DT_DOUBLE),  // Type_Float64 = 11,
-	tf.DataType(tfproto.DataType_DT_STRING),  // Type_String = 12,
+	tf.DataType(typesproto.DataType_DT_INVALID), // Type_Null = 0,
+	tf.DataType(typesproto.DataType_DT_UINT8),   // Type_Uint8 = 1,
+	tf.DataType(typesproto.DataType_DT_INT8),    // Type_Int8 = 2,
+	tf.DataType(typesproto.DataType_DT_UINT16),  // Type_Uint16 = 3,
+	tf.DataType(typesproto.DataType_DT_INT16),   // Type_Int16 = 4,
+	tf.DataType(typesproto.DataType_DT_UINT32),  // Type_Uint32 = 5,
+	tf.DataType(typesproto.DataType_DT_INT32),   // Type_Int32 = 6,
+	tf.DataType(typesproto.DataType_DT_UINT64),  // Type_Uint64 = 7,
+	tf.DataType(typesproto.DataType_DT_INT64),   // Type_Int64 = 8,
+	tf.DataType(typesproto.DataType_DT_HALF),    // Type_Float16 = 9,
+	tf.DataType(typesproto.DataType_DT_FLOAT),   // Type_Float32 = 10,
+	tf.DataType(typesproto.DataType_DT_DOUBLE),  // Type_Float64 = 11,
+	tf.DataType(typesproto.DataType_DT_STRING),  // Type_String = 12,
 }
 
 func tensorFromNT(nt *graphpipe.NativeTensor) (*tf.Tensor, error) {

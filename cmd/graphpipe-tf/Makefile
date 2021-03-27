@@ -44,7 +44,7 @@ in-docker:
 		-e GOPATH=/go \
 		-e CHOWN=$$(id -u):$$(id -g) \
 		$(LIBTF_IMAGE):$(RUN_TYPE)-dev \
-		/usr/bin/make $(RUN_TYPE) tf-generate graphpipe-tf
+		/usr/bin/make $(RUN_TYPE) tf-generate protobuf graphpipe-tf
 
 check-go-version:
 	$(eval min_version := go1.8)
@@ -129,16 +129,19 @@ TF=$(GOPATH)/src/github.com/tensorflow/tensorflow
 PROTOS = $(TF)/tensorflow/core/protobuf/config.proto \
 	$(TF)/tensorflow/core/protobuf/debug.proto \
 	$(TF)/tensorflow/core/protobuf/cluster.proto \
-	$(TF)/tensorflow/core/protobuf/rewriter_config.proto
+	$(TF)/tensorflow/core/protobuf/rewriter_config.proto \
+	$(TF)/tensorflow/core/protobuf/verifier_config.proto
 
 protobuf:
 	go get github.com/gogo/protobuf/proto
 	go get github.com/gogo/protobuf/gogoproto
-	go get github.com/tensorflow/tensorflow/tensorflow/go
 	cd protoc-gen-gogotf && go install
-	PATH=$(GOPATH)/bin:$(PATH) $(PROTOC) -I$(TF)/ $(TF)/tensorflow/core/framework/*.proto --gogotf_out=internal/
-	PATH=$(GOPATH)/bin:$(PATH) $(PROTOC) -I$(TF)/ $(PROTOS) --gogotf_out=internal/
-	sed -i 's;github.com/tensorflow;github.com/vishvananda/graphpipe-go/cmd/graphpipe-tf/internal/github.com/tensorflow;g' internal/github.com/tensorflow/tensorflow/tensorflow/go/core/protobuf/*.pb.go
+	for f in $(TF)/tensorflow/core/framework/*.proto; do $(PROTOC) -I$(TF)/ $$f --gogotf_out=internal/; done
+	$(PROTOC) -I$(TF)/ $(TF)/tensorflow/stream_executor/*.proto --gogotf_out=internal/
+	$(PROTOC) -I$(TF)/ $(TF)/tensorflow/core/protobuf/*.proto --gogotf_out=\
+	Mgoogle/protobuf/any.proto=github.com/gogo/protobuf/types,\
+	Mgoogle/protobuf/duration.proto=github.com/gogo/protobuf/types:internal/
+	sed -i 's;github.com/tensorflow;github.com/vishvananda/graphpipe-go/cmd/graphpipe-tf/internal/github.com/tensorflow;g' internal/github.com/tensorflow/tensorflow/tensorflow/go/*/*/*/*.pb.go
 
 VER=tensorflow@v$(TF_VER)+incompatible
 
