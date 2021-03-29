@@ -290,10 +290,6 @@ func graphContainsNode(g graphproto.GraphDef, name string) bool {
 }
 
 func serve(opts options) error {
-	if err := os.MkdirAll(opts.cacheDir, 0700); err != nil {
-		logrus.Errorf("Could not make state dir '%s': %v", opts.cacheDir, err)
-		return err
-	}
 
 	c := &tfContext{}
 
@@ -319,6 +315,10 @@ func serve(opts options) error {
 
 	cachePath := ""
 	if opts.cache {
+		if err := os.MkdirAll(opts.cacheDir, 0700); err != nil {
+			logrus.Errorf("Could not make state dir '%s': %v", opts.cacheDir, err)
+			return err
+		}
 		cachePath = filepath.Join(opts.cacheDir, fmt.Sprintf("%x.db", c.modelHash))
 	}
 
