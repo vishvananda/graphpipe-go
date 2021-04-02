@@ -14,7 +14,6 @@ learning libraries, our dev and build system for graphpipe-tf is 100% docker-dri
 Our build system can output images in three configurations:
 
 * *cpu* (default) - create an Ubuntu-based build for cpu inference.  In this configuration, the BLAS backend is MKL.
-* *oraclelinux-cpu* - same as cpu, but using oraclelinux as a base image.
 * *gpu* - create an Ubuntu-based build for gpu inference.  If no physical gpu is present, inference falls back to 
   MKL cpu inference
 

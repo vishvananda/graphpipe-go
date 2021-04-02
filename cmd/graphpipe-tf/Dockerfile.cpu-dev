@@ -33,7 +33,8 @@ RUN yes "" | ./configure
 
 RUN apt-get install -y python3-distutils python3-numpy
 RUN bazel build --config=mkl --config=monolithic //tensorflow:libtensorflow.so
-RUN cp bazel-bin/tensorflow/libtensorflow.so /usr/local/lib
-RUN cp /root/.cache/bazel/_bazel_root/*/execroot/org_tensorflow/bazel-out/host/bin/external/llvm_openmp/libiomp5.so /usr/local/lib
+RUN cp bazel-bin/tensorflow/libtensorflow.so /usr/lib
+RUN cp /root/.cache/bazel/_bazel_root/*/execroot/org_tensorflow/bazel-out/host/bin/external/llvm_openmp/libiomp5.so /usr/lib
 RUN ldconfig
+
 RUN ln -s /tensorflow/tensorflow /usr/local/include/tensorflow

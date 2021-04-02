@@ -1,11 +1,16 @@
-FROM ubuntu:16.04
+FROM libtensorflow:cpu-dev
 
 ENV GOPATH=/go
-RUN apt-get update && apt-get install -y ca-certificates libstdc++6
-COPY graphpipe-tf /
-COPY lib/libiomp5.so /usr/local/lib
-COPY lib/libmklml_intel.so /usr/local/lib
-COPY lib/libtensorflow.so /usr/local/lib
+RUN mkdir -p /go/src/github.com/vishvananda/graphpipe-go/
+COPY . /go/src/github.com/vishvananda/graphpipe-go/
+WORKDIR /go/src/github.com/vishvananda/graphpipe-go/cmd/graphpipe-tf
+RUN make tf-generate graphpipe-tf
 
+FROM ubuntu:20.04
+
+RUN apt-get update && apt-get install -y ca-certificates libstdc++6
+COPY --from=0 /go/src/github.com/vishvananda/graphpipe-go/cmd/graphpipe-tf/graphpipe-tf /
+COPY --from=0 /usr/lib/libiomp5.so /usr/lib
+COPY --from=0 /usr/lib/libtensorflow.so /usr/lib
 RUN ldconfig
 ENTRYPOINT ["/graphpipe-tf"]

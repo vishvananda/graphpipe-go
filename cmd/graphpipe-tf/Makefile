@@ -44,7 +44,7 @@ in-docker:
 		-e GOPATH=/go \
 		-e CHOWN=$$(id -u):$$(id -g) \
 		$(LIBTF_IMAGE):$(RUN_TYPE)-dev \
-		/usr/bin/make $(RUN_TYPE) tf-generate protobuf graphpipe-tf
+		/usr/bin/make $(RUN_TYPE) tf-generate graphpipe-tf
 
 check-go-version:
 	$(eval min_version := go1.8)
@@ -97,8 +97,8 @@ devserver:
 		--listen=0.0.0.0:9000
 
 runtime-container:
-	docker build \
-		-f Dockerfile.$(RUN_TYPE) \
+	cd ../../ && docker build \
+		-f cmd/graphpipe-tf/Dockerfile.$(RUN_TYPE) \
 		-t $(GRAPHPIPE_TF_IMAGE):$(RUN_TYPE) \
 		--build-arg http_proxy=$(http_proxy) \
 		--build-arg https_proxy=$(https_proxy) \
